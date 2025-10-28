@@ -6,6 +6,15 @@ from datetime import date
 from projects import projects,headers
 
 directory_name = f"{date.today()}"
+try:
+    os.mkdir(directory_name)
+    print(f"Directory {directory_name} created Successfully")
+except FileExistsError:
+    print(f"Directory {directory_name} Already Exists")
+except PermissionError:
+    print(f"Unable to create Directory {directory_name}: Permission Denied")
+except Exception as e:
+    print(f"An error '{e}' Happened")
 
 def export_projects(id):
     print(f"\nCURRENT PROJECT: {projects[id]}")
