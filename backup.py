@@ -23,7 +23,7 @@ except Exception as e:
 projects = {
     '72990278':'portfolio', # id:project-name
     '74623144':'dent-ai',
-    '72906451':'Docker Practice'
+    '72906451':'DockerPractice'
 }
 
 def export_projects(id):
@@ -46,7 +46,7 @@ def export_projects(id):
         if response.json()["export_status"] == "finished":
             response = requests.get(f"https://gitlab.com/api/v4/projects/{id}/export/download", headers=headers)
             try:
-                with open(f"{directory_name}/{projects[id]}_backup.tar", 'wb') as f:
+                with open(f"{directory_name}/{projects[id]}_backup.tar.gz", 'wb') as f:
                     for chunk in response.iter_content(chunk_size=8192): 
                         f.write(chunk)
             except Exception as e:
@@ -62,12 +62,27 @@ def export_projects(id):
     
 def import_projects(id):
     print("\nStarting Import")
+    data = {
+        "path":f"{projects[id]}_backup.tar.gz"
+    }
+    print("Waiting for Import to finish")
     try:
-        files = { "file": open(f"{directory_name}/{projects[id]}_backup.tar", 'rb') }
-        response = requests.post(f"https://gitlab.com/api/v4/projects/import", headers=headers, files=files)
-        print("Import Successful\n") 
+        files = { "file": open(f"{directory_name}/{projects[id]}_backup.tar.gz", 'rb') }
+        response = requests.post(f"https://gitlab.com/api/v4/projects/import", headers=headers, files=files, data=data)
+        
+        while response.json()["import_status"] != "finished":
+            time.sleep(10)
+            Check = 1      
+            response = requests.get(f"https://gitlab.com/api/v4/projects/import", headers=headers, files=files, data=data)   
+            Check += 1 
+            if Check >= 30:
+                print("Timed Out")
+                exit()        
+        
+        print("Import Successful\n")
     except Exception as e:
         print("Error '{e}' Occured")
+        print(response.json())
     
 def main():
     for id in projects.keys():
