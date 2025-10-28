@@ -50,7 +50,7 @@ def export_projects(id):
                     for chunk in response.iter_content(chunk_size=8192): 
                         f.write(chunk)
             except Exception as e:
-                print("Error '{e}' Occured")
+                print(f"Error '{e}' Occured")
             break
         Check += 1 
         if Check >= 30:
@@ -63,17 +63,18 @@ def export_projects(id):
 def import_projects(id):
     print("\nStarting Import")
     data = {
-        "path":f"{projects[id]}_backup.tar.gz"
+        "path":f"{projects[id]}_{date.today()}.tar.gz"
     }
     print("Waiting for Import to finish")
     try:
         files = { "file": open(f"{directory_name}/{projects[id]}_backup.tar.gz", 'rb') }
         response = requests.post(f"https://gitlab.com/api/v4/projects/import", headers=headers, files=files, data=data)
+        new_project_id = response.json()["id"]
         
         while response.json()["import_status"] != "finished":
             time.sleep(10)
-            Check = 1      
-            response = requests.get(f"https://gitlab.com/api/v4/projects/import", headers=headers, files=files, data=data)   
+            Check = 1   
+            response = requests.get(f"https://gitlab.com/api/v4/projects/{new_project_id}/import", headers=headers)
             Check += 1 
             if Check >= 30:
                 print("Timed Out")
@@ -81,7 +82,6 @@ def import_projects(id):
         
         print("Import Successful\n")
     except Exception as e:
-        print("Error '{e}' Occured")
         print(response.json())
     
 def main():
