@@ -42,7 +42,7 @@ def get_file_path():
     
     root.destroy()
     
-if file_path:  
+    if file_path:  
         file_name = os.path.basename(file_path)
         return file_path, file_name
     else:
