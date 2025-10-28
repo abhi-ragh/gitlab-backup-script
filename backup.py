@@ -21,7 +21,7 @@ except Exception as e:
     print(f"An error '{e}' Happened")
  
 projects = {
-    '72990278':'portfolio',
+    '72990278':'portfolio', # id:project-name
     '74623144':'dent-ai',
     '72906451':'Docker Practice'
 }
@@ -40,8 +40,8 @@ def export_projects(id):
     print("Waiting The Export to Finish")
     
     while True:
-        time.sleep(10)
-        Check = 1
+        time.sleep(10) # sleep to make sure to not spam the api 
+        Check = 1      # Check to make sure the while loop doesnt continue forever 
         response = requests.get(f"https://gitlab.com/api/v4/projects/{id}/export", headers=headers)   
         if response.json()["export_status"] == "finished":
             response = requests.get(f"https://gitlab.com/api/v4/projects/{id}/export/download", headers=headers)
