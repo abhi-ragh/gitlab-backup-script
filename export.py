@@ -36,7 +36,7 @@ def export_projects(id):
         if response.json()["export_status"] == "finished":
             response = requests.get(f"https://gitlab.com/api/v4/projects/{id}/export/download", headers=headers)
             try:
-                with open(f"{directory_name}/{projects[id]}_backup.tar.gz", 'wb') as f:
+                with open(f"{directory_name}/{projects[id]}_{date.today()}.tar.gz", 'wb') as f:
                     for chunk in response.iter_content(chunk_size=8192): 
                         f.write(chunk)
             except Exception as e:
