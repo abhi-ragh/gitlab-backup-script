@@ -66,7 +66,7 @@ def import_projects(id):
         "path":f"{projects[id]}_{date.today()}.tar.gz"
     }
     print("Waiting for Import to finish")
-    try:
+    try:abhiragh0/portfolio_2025-10-28.tar.gz
         files = { "file": open(f"{directory_name}/{projects[id]}_backup.tar.gz", 'rb') }
         response = requests.post(f"https://gitlab.com/api/v4/projects/import", headers=headers, files=files, data=data)
         new_project_id = response.json()["id"]
@@ -82,7 +82,7 @@ def import_projects(id):
         
         print("Import Successful\n")
     except Exception as e:
-        print(response.json())
+        print(response.json())abhiragh0/portfolio_2025-10-28.tar.gz
     
 def main():
     for id in projects.keys():
