@@ -17,8 +17,8 @@ except Exception as e:
     print(f"An error '{e}' Happened")
 
 def export_projects(id):
-    print(f"\nCURRENT PROJECT: {projects[id]}")
-    response = requests.post(f"https://gitlab.com/api/v4/projects/{id}/export", headers=headers)
+    print(f"\nCURRENT PROJECT: {id}")
+    response = requests.post(f"https://gitlab.com/api/v4/projects/abhiragh0%2F{id}/export", headers=headers)
     
     if response.json()["message"] == "202 Accepted":
         print("Export Request Sent!")
@@ -32,11 +32,11 @@ def export_projects(id):
     while True:
         time.sleep(10) # sleep to make sure to not spam the api 
         Check = 1      # Check to make sure the while loop doesnt continue forever 
-        response = requests.get(f"https://gitlab.com/api/v4/projects/{id}/export", headers=headers)   
+        response = requests.get(f"https://gitlab.com/api/v4/projects/abhiragh0%2F{id}/export", headers=headers)   
         if response.json()["export_status"] == "finished":
-            response = requests.get(f"https://gitlab.com/api/v4/projects/{id}/export/download", headers=headers)
+            response = requests.get(f"https://gitlab.com/api/v4/projects/abhiragh0%2F{id}/export/download", headers=headers)
             try:
-                with open(f"Backups/{directory_name}/{projects[id]}_{date.today()}.tar.gz", 'wb') as f:
+                with open(f"Backups/{directory_name}/{id}.tar.gz", 'wb') as f:
                     for chunk in response.iter_content(chunk_size=8192): 
                         f.write(chunk)
             except Exception as e:
@@ -47,10 +47,10 @@ def export_projects(id):
             print("Timed Out")
             exit()
             
-    print(f"{projects[id]} Export Downloaded")
+    print(f"{id} Export Downloaded")
     
 def main():
-    for id in projects.keys():
+    for id in projects:
         export_projects(id)
 
 if __name__ == "__main__":
