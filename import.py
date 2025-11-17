@@ -102,7 +102,7 @@ def get_s3_file_path(Prefix):
         return prefix[choice], prefix[choice].split("/")[-1].replace(".tar.gz","")
     
     return get_s3_file_path(prefix[choice])
-    
+
 
 def main():
     print("Select File to Import")
@@ -132,6 +132,7 @@ def main():
         import_projects(path, name, data, files)
     else:
         print("No file was selected")
+    
 
 if __name__ == "__main__":
     main()

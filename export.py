@@ -58,10 +58,18 @@ def export_projects(id):
     s3.upload_file(path, BUCKET, path)
     
     print(f"{id} was uploaded to S3 Storage")
-    
+
+def retention_check():
+    no_of_backups = len(os.listdir(os.getcwd() + "/Backups"))
+    if no_of_backups >= 7:
+        oldest_dir = min(os.listdir(os.getcwd()+"/Backups"))
+        os.remove(oldest_dir)   
+
 def main():
     for id in projects:
         export_projects(id)
+    retention_check()
+    
 
 if __name__ == "__main__":
     main()
