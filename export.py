@@ -60,9 +60,11 @@ def export_projects(id):
     print(f"{id} was uploaded to S3 Storage")
 
 def retention_check():
+    print("Start Retention Check")
     no_of_backups = len(os.listdir(os.getcwd() + "/Backups"))
     if no_of_backups >= 7:
         oldest_dir = min(os.listdir(os.getcwd()+"/Backups"))
+        print("Deleting Backup Older than 7 days from Local Storage.")
         os.remove(oldest_dir)   
 
 def main():
