@@ -1,11 +1,16 @@
 import os 
 import requests
 import time 
+import boto3
 from datetime import date
 
 from projects import projects,headers
 
 directory_name = f"{date.today()}"
+
+s3 = boto3.client("s3")
+BUCKET = "repo-backup-abhiragh"
+
 try:
     os.mkdir(f"Backups/{directory_name}")
     print(f"Directory {directory_name} created Successfully")
@@ -46,8 +51,13 @@ def export_projects(id):
         if Check >= 30:
             print("Timed Out")
             exit()
-            
+    
     print(f"{id} Export Downloaded")
+        
+    path = f"Backups/{directory_name}/{id}.tar.gz"
+    s3.upload_file(path, BUCKET, path)
+    
+    print(f"{id} was uploaded to S3 Storage")
     
 def main():
     for id in projects:

@@ -1,8 +1,12 @@
 import os
 import requests
 import time
+import boto3
 
 from projects import projects, headers
+
+s3 = boto3.client("s3")
+BUCKET = "repo-backup-abhiragh"
 
 def delete_project(project_name):
     try:
@@ -17,19 +21,15 @@ def delete_project(project_name):
         print("Error:", e)
         
 
-def import_projects(path, name):
+def import_projects(path, name, data, files):
     print("\nStarting Import")
     
-    project_name = name.split(".")[0]
-    
-    data = {
-        "path": project_name
-    }
+    data = data
         
-    delete_project(project_name)
+    delete_project(name)
 
     try:
-        files = { "file": open(path, "rb") }
+        files = files
         response = requests.post(
             "https://gitlab.com/api/v4/projects/import",
             headers=headers,
@@ -74,19 +74,62 @@ def get_file_path(path):
     path = path +"/"+dir_list[choice]
     
     if dir_list[choice].endswith((".tar.gz",)) == True:
-        return path, dir_list[choice]
+        return path, dir_list[choice].split(".")[0]
     
     return get_file_path(path)
+    
+def get_s3_file_path(Prefix):
+    resp = s3.list_objects_v2(
+        Bucket=BUCKET,
+        Prefix=Prefix,
+        Delimiter="/"
+    )
+
+    prefix = []
+    
+    try:
+        for i in resp['CommonPrefixes']:
+            prefix.append(i['Prefix'])    
+            print(prefix.index(i['Prefix']),":",i['Prefix'])
+    except:
+        for i in resp['Contents']:
+            prefix.append(i['Key'])    
+            print(prefix.index(i['Key']),":",i['Key'])
+
+    choice = int(input("Enter a Option Number: "))
+    
+    if prefix[choice].endswith((".tar.gz",)) == True:
+        return prefix[choice], prefix[choice].split("/")[-1].replace(".tar.gz","")
+    
+    return get_s3_file_path(prefix[choice])
     
 
 def main():
     print("Select File to Import")
+    ch = int(input("1. Local Storage\n2. S3 Storage\nChoose: "))
     
-    path = os.getcwd() + "/Backups"
-    path, name = get_file_path(path)
+    if ch==1:
+        path = os.getcwd() + "/Backups"
+        path, name = get_file_path(path)
+        data = {
+            "path": name
+        }
+        files = { "file": open(path, "rb") }
+
+    elif ch==2:
+        path, name = get_s3_file_path("Backups/")
+        obj = s3.get_object(Bucket=BUCKET, Key=path)
+        file_bytes = obj["Body"].read()
+        files = {
+            "file": (name + ".tar.gz", file_bytes)
+        }
+        data = {
+            "path": name
+        }
+
     
     if path and name:
-        import_projects(path, name)
+        import_projects(path, name, data, files)
     else:
         print("No file was selected")
 
