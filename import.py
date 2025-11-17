@@ -1,8 +1,6 @@
 import os
 import requests
 import time
-import tkinter as tk
-from tkinter import filedialog
 
 from projects import projects, headers
 
@@ -67,20 +65,26 @@ def import_projects(path, name):
     except Exception as e:
         print("Error:", e)
 
-def get_file_path():
-    root = tk.Tk()
-    root.withdraw()
-    file_path = filedialog.askopenfilename()
-    root.destroy()
-
-    if file_path:
-        return file_path, os.path.basename(file_path)
-    return None, None
+def get_file_path(path):
+    dir_list = os.listdir(path)
+    for i in dir_list:
+        print(dir_list.index(i),":",i)
+    
+    choice = int(input("Enter Folder Number: "))
+    path = path +"/"+dir_list[choice]
+    
+    if dir_list[choice].endswith((".tar.gz",)) == True:
+        return path, dir_list[choice]
+    
+    return get_file_path(path)
+    
 
 def main():
     print("Select File to Import")
     
-    path, name = get_file_path()
+    path = os.getcwd() + "/Backups"
+    path, name = get_file_path(path)
+    
     if path and name:
         import_projects(path, name)
     else:
